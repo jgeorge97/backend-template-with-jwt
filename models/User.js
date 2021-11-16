@@ -15,11 +15,24 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    created_at: {
+        type: Date,
+        required: true,
+        default: new Date()
+    },
+    updated_at: {
+        type: Date,
+        required: true,
+        default: new Date()
+    },
 });
 
 userSchema.methods.generateAuthToken = function () {
-    const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY);
-    return token;
+    var tokens = {};
+
+    tokens.accessToken = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+    tokens.refreshToken = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '6h' });
+    return tokens;
 };
 
 const User = mongoose.model("user", userSchema);
